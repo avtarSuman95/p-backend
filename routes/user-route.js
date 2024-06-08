@@ -3,6 +3,8 @@ const express = require("express");
 const multer = require("multer");
 const router = express.Router();
 const app = express();
+const jwt = require("jsonwebtoken");
+const secretKey = "secretkey";
 
 const {
   addUser,
@@ -30,6 +32,7 @@ router.use("/usersDetails", express.static("./uploads"));
 router.post("/usersDetails", upload.single("profile"), async (req, res) => {
   res.header("xyz", JSON.stringify({ xyz: "xyz" }));
   let user = await addUser(req.body);
+  let token = jwt.sign({ user }, secretKey, { expiresIn: "7d" });
   console.log("USER", user);
   console.log("BODY", req.body);
   console.log("FILE", req.file);
@@ -37,6 +40,7 @@ router.post("/usersDetails", upload.single("profile"), async (req, res) => {
   res.send({
     profile_url: `http://localhost:4000/usersDetails/${req.file.filename}`,
     user,
+    token,
   });
 });
 
